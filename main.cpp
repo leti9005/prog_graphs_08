@@ -9,19 +9,34 @@ int main()
 {
     Graphs::Graph graph;
     graph.AddEdge('A', 'B', 4);
-    graph.AddEdge('A', 'C', 3);
-    graph.AddEdge('A', 'E', 7);
-    graph.AddEdge('B', 'D', 5);
-    graph.AddEdge('D', 'F', 2);
+    graph.AddEdge('A', 'C', 2);
 
-    cout << graph.GetDistance('A', 'F') << endl;
+    graph.AddEdge('C', 'E', 5);
+    graph.AddEdge('C', 'B', 1);
+    graph.AddEdge('B', 'C', 3);
 
+    graph.AddEdge('B', 'D', 2);
+    graph.AddEdge('B', 'E', 3);
+    graph.AddEdge('E', 'D', 1);
 
-    // int from, to;
-    // cout << "Print start vertex (0-" << endl;  //<< graph.get_len() << "): ";
-    // cin >> from;
-    // cout << "Print end vertex: ";
-    // cin >> to;
+    Graphs::NodeId from;
+    Graphs::NodeId to;
+
+    cout << "Measure distance" << endl;
+    cout << "From (char): ";
+    cin >> from;
+    cout << "To (char): ";
+    cin >> to;
+
+    auto distance = graph.GetDistance(from, to);
+
+    if (distance == INT16_MAX)
+    {
+        cout << "No path between specified nodes." << endl;
+        return 0;
+    }
+
+    cout << distance << endl;
 
     return 0;
 }

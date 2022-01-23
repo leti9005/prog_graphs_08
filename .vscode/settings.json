@@ -46,6 +46,7 @@
         "utility": "cpp",
         "numbers": "cpp",
         "climits": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "set": "cpp"
     }
 }
