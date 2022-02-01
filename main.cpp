@@ -14,10 +14,18 @@ int main()
     graph1.add_link('B', 'D', 2);
     graph1.add_link('B', 'E', 3);
     graph1.add_link('E', 'D', 1);
-    graph1.add_link('E', 'F', 4);
 
+    char from;
+    char to;
 
-    graph1.dijkstra('A', 'F');
+    cout << "Get path" << endl;
+    cout << "From (char): ";
+    cin >> from;
+    cout << "To (char): ";
+    cin >> to;
+
+    graph1.dijkstra(from, to);
+    std::cout << std::endl;
 
     return 0;
 }
