@@ -1,95 +1,86 @@
-#include <limits>
 #include <iostream>
-#include <unordered_map>
+#include <limits>
 #include <vector>
-#include <set>
-#include <algorithm>
 
-namespace Graphs
-{
-    using NodeId = char;
+using intvector = std::vector<int>;
 
-    struct Link {
-        NodeId To;
-        int Weight;
-
-        Link(NodeId dest, int weight):
-            To(dest),
-            Weight(weight)
-        {
-        }
-    };
-
-    class Graph
-    {
-        std::unordered_map<NodeId, std::vector<Link>> _graph;
-
-    public:
-        Graph()
-        {
-        }
-
-        void AddEdge(NodeId from, NodeId to, int weight)
-        {
-            if (std::any_of(
-                this->_graph[from].begin(),
-                this->_graph[from].end(),
-                [&to](Link e) {
-                    return e.To == to;
-                }))
-            {
-                throw std::exception();
-            }
-
-            this->_graph[from].push_back(Link(to, weight));
-        }
-
-        int GetDistance(NodeId from, NodeId to)
-        {
-            std::unordered_map<NodeId, int> distanceTo;
-            std::set<NodeId> unvisitedNodes;
-
-            for (const auto &[key, value]: this->_graph) {
-                distanceTo[key] = INT16_MAX;
-
-                for (auto n: value)
-                {
-                    distanceTo[n.To] = INT16_MAX;
-                    unvisitedNodes.insert(n.To);
-                }
-
-                unvisitedNodes.insert(key);
-            }
-
-            for (auto link: this->_graph[from])
-            {
-                distanceTo[link.To] = link.Weight;
-            }
-            unvisitedNodes.erase(from);
-
-            distanceTo[from] = 0;
-            while (!unvisitedNodes.empty())
-            {
-                auto it = std::min_element(
-                    std::begin(unvisitedNodes),
-                    std::end(unvisitedNodes),
-                    [&distanceTo](const NodeId& l, const NodeId& r) { return distanceTo[l] < distanceTo[r]; }
-                );
-
-                NodeId currentVisitedNode = *it;
-
-                for (auto link: this->_graph[currentVisitedNode])
-                {
-                    distanceTo[link.To] = std::min(
-                        distanceTo[currentVisitedNode] + link.Weight,
-                        distanceTo[link.To]
-                    );
-                }
-
-                unvisitedNodes.erase(currentVisitedNode);
-            }
-
-            return distanceTo[to];
-        }
-    };
+char int2char(int a) {
+    return char('A' + a);
 }
+
+int char2int(char a) {
+    return int(a - 'A');
+}
+
+void printPath(intvector &parent, int j) {
+    if (parent[j] == -1) {
+        return;
+    }
+
+    printPath(parent, parent[j]);
+
+    printf("%c ", int2char(j));
+}
+
+struct Graph {
+    std::vector<intvector> graph;
+
+    explicit Graph(int vcount) {
+        graph.resize(vcount);
+        for (auto &l: graph) {
+            l.resize(vcount);
+        }
+    }
+
+    static void printSolution(intvector &dist, int src, int dst, intvector &parent) {
+        std::cout << int2char(src) << " -> " << int2char(dst) << std::endl;
+        std::cout << "Distance: " << dist[dst] << " Path: " << int2char(src) << " ";
+        printPath(parent, dst);
+    }
+
+    int minDistance(const intvector &dist, const std::vector<bool> &sptSet) const {
+        int min = std::numeric_limits<int>::max();
+        int min_index = 0;
+        int vcount = (int ) graph.size();
+
+        for (int v = 0; v < vcount; v++) {
+            if (!sptSet[v] && dist[v] <= min) {
+                min = dist[v], min_index = v;
+            }
+        }
+
+        return min_index;
+    }
+
+    void dijkstra(char srcchar, char dstchar) {
+        int vcount = (int) graph.size();
+        int src = char2int(srcchar);
+        int dst = char2int(dstchar);
+
+        intvector dist(vcount, std::numeric_limits<int>::max());
+        intvector parent(vcount, -1);
+        std::vector<bool> sptSet(vcount, false);
+
+        dist[src] = 0;
+
+        for (int count = 0; count < vcount - 1; ++count) {
+            int u = minDistance(dist, sptSet);
+
+            sptSet[u] = true;
+
+            for (int v = 0; v < vcount; v++) {
+                if (!sptSet[v] && graph[u][v] && dist[u] + graph[u][v] < dist[v]) {
+                    parent[v] = u;
+                    dist[v] = dist[u] + graph[u][v];
+                }
+            }
+        }
+        printSolution(dist, src, dst, parent);
+    }
+
+    void add_link(const char a, const char b, const int w) {
+        graph[char2int(a)][char2int(b)] = w;
+    }
+
+};
+
